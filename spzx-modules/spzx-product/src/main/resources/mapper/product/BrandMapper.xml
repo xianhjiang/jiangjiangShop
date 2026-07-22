@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.spzx.product.mapper.BrandMapper">
+
+    <resultMap id="BrandResultMap" type="Brand" autoMapping="true">
+
+    </resultMap>
+    
+    <select id="list" parameterType="Brand" resultMap="BrandResultMap">
+        select
+            id, name, logo, create_time, remark
+            from brand
+        <where>
+            <if test="name != null and name != ''">
+                and name like concat(#{name},'%')
+            </if>
+            and del_flag = '0'
+        </where>
+        order by id desc
+    </select>
+
+
+    <select id="getById" parameterType="long" resultMap="BrandResultMap">
+        select
+            id, name, logo, remark
+        from brand where id=#{id} and del_flag = '0'
+    </select>
+    
+    <insert id="insert" parameterType="Brand" useGeneratedKeys="true" keyProperty="id">
+        insert into brand(name,logo) values(#{name},#{logo})
+    </insert>
+    
+    <update id="update" parameterType="Brand">
+        update brand
+        set name=#{name},
+            logo=#{logo}
+        where id = #{id}
+    </update>
+
+    <!--
+    Caused by: org.apache.ibatis.binding.BindingException: Parameter 'ids' not found. Available parameters are [array, arg0]
+    -->
+    <delete id="deleteBatch">
+        update brand set del_flag= '2' where id in
+        <foreach collection="arg0" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="selectBrandAll" resultMap="BrandResultMap">
+        select
+            id, name, logo, remark
+        from brand where del_flag = '0'
+    </select>
+</mapper>
